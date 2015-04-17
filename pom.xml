@@ -64,6 +64,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>2.10.2</maven-javadoc-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.5</nexus-staging-maven-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <animal-sniffer-maven-plugin.version>1.14</animal-sniffer-maven-plugin.version>
@@ -310,6 +311,26 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-dependency-plugin</artifactId>
+            	<version>${maven-dependency-plugin.version}</version>
+            	<executions>
+            		<execution>
+            			<id>copy-dependencies</id>
+            			<phase>package</phase>
+            			<goals>
+            				<goal>copy-dependencies</goal>
+            			</goals>
+            			<configuration>
+            				<outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+            				<overWriteReleases>false</overWriteReleases>
+            				<overWriteSnapshots>false</overWriteSnapshots>
+            				<overWriteIfNewer>true</overWriteIfNewer>
+            			</configuration>
+            		</execution>
+            	</executions>
             </plugin>
             <!-- Deployment / build plugins END -->
         </plugins>
