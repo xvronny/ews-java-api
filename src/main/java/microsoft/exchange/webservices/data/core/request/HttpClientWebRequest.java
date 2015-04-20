@@ -25,6 +25,8 @@ package microsoft.exchange.webservices.data.core.request;
 
 import microsoft.exchange.webservices.data.core.WebProxy;
 import microsoft.exchange.webservices.data.exception.EWSHttpException;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -149,6 +151,20 @@ public class HttpClientWebRequest extends HttpWebRequest {
     if (isAllowAuthentication() && getUsername() != null) {
       NTCredentials webServiceCredentials = new NTCredentials(getUsername(), getPassword(), "", getDomain());
       credentialsProvider.setCredentials(new AuthScope(AuthScope.ANY), webServiceCredentials);
+    }
+    
+    // EWS PreAuthentication uses Basic Access Authentication scheme
+    // http://weblog.west-wind.com/posts/2010/Feb/18/NET-WebRequestPreAuthenticate-not-quite-what-it-sounds-like
+    if (this.isPreAuthenticate() && (getUsername() != null) && (getPassword() != null)) {
+      
+      // The authentication header string format is defined in RFC 1945
+      // http://tools.ietf.org/html/rfc1945#section-11.1
+      String authz = String.format("%s:%s", getUsername(), getPassword());
+      authz = new String(Base64.encodeBase64(authz.getBytes()));
+      authz = String.format("Basic %s", authz);
+      
+      // Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+      httpPost.addHeader("Authorization", authz);
     }
 
     httpContext.setCredentialsProvider(credentialsProvider);
