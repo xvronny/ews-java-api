@@ -25,6 +25,8 @@ package microsoft.exchange.webservices.data.core.request;
 
 import microsoft.exchange.webservices.data.core.WebProxy;
 import microsoft.exchange.webservices.data.exception.EWSHttpException;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -149,6 +151,21 @@ public class HttpClientWebRequest extends HttpWebRequest {
     if (isAllowAuthentication() && getUsername() != null) {
       NTCredentials webServiceCredentials = new NTCredentials(getUsername(), getPassword(), "", getDomain());
       credentialsProvider.setCredentials(new AuthScope(AuthScope.ANY), webServiceCredentials);
+    }
+    
+    // preAuthentication implementation
+    if ((this.isPreAuthenticate()) && (getUsername() != null)) {
+      // HACK: Add Authorization header explicitly because the http
+      // client is an idiot and sends an unauthenticated request
+      // first every time, then an authenticated one when it gets
+      // the 401 response.
+
+      // Authorization: Basic dXNlcjFAZG9tYWluLmNvbTpwYXNz
+      String authz = String.format("%s:%s", getUsername(), getPassword());
+      authz = new String(Base64.encodeBase64(authz.getBytes()));
+      authz = String.format("Basic %s", authz);
+      
+      httpPost.addHeader("Authorization", authz);
     }
 
     httpContext.setCredentialsProvider(credentialsProvider);
