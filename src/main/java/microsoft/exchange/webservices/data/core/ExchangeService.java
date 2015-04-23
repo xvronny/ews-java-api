@@ -163,6 +163,7 @@ import microsoft.exchange.webservices.data.property.complex.RuleOperation;
 import microsoft.exchange.webservices.data.property.complex.StringList;
 import microsoft.exchange.webservices.data.property.complex.UserId;
 import microsoft.exchange.webservices.data.property.complex.availability.OofSettings;
+import microsoft.exchange.webservices.data.property.complex.time.OlsonTimeZoneDefinition;
 import microsoft.exchange.webservices.data.property.complex.time.TimeZoneDefinition;
 import microsoft.exchange.webservices.data.property.definition.PropertyDefinitionBase;
 import microsoft.exchange.webservices.data.search.CalendarView;
@@ -178,6 +179,7 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 import microsoft.exchange.webservices.data.sync.ChangeCollection;
 import microsoft.exchange.webservices.data.sync.FolderChange;
 import microsoft.exchange.webservices.data.sync.ItemChange;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -3975,57 +3977,33 @@ public class ExchangeService extends ExchangeServiceBase implements IAutodiscove
   }
 
   /**
-   * Retrieves the definitions of the specified server-side time zones.
+   * Retrieves the time zone definitions in the Microsoft Exchange Server format.
    *
-   * @param timeZoneIds the time zone ids
+   * @param olsonTimeZoneIds the id strings of TimeZone in Olson/Java format
    * @return A Collection containing the definitions of the specified time
    * zones.
    */
   public Collection<TimeZoneDefinition> getServerTimeZones(
-      Iterable<String> timeZoneIds) {
-    Date today = new Date();
-    Collection<TimeZoneDefinition> timeZoneList = new ArrayList<TimeZoneDefinition>();
-    for (String timeZoneId : timeZoneIds) {
-      TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition();
+      Iterable<String> olsonTimeZoneIds) {
+    
+	Collection<TimeZoneDefinition> timeZoneList = new ArrayList<TimeZoneDefinition>();
+    for (String timeZoneId : olsonTimeZoneIds) {
+      TimeZone javaTz = TimeZone.getTimeZone(timeZoneId);
+      TimeZoneDefinition timeZoneDefinition = new OlsonTimeZoneDefinition(javaTz);
       timeZoneList.add(timeZoneDefinition);
-      TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-      timeZoneDefinition.id = timeZone.getID();
-      timeZoneDefinition.name = timeZone.getDisplayName(timeZone
-          .inDaylightTime(today), TimeZone.LONG);
-			/*
-			 * String shortName =
-			 * timeZone.getDisplayName(timeZone.inDaylightTime(today),
-			 * TimeZone.SHORT); String longName =
-			 * timeZone.getDisplayName(timeZone.inDaylightTime(today),
-			 * TimeZone.LONG); int rawOffset = timeZone.getRawOffset(); int hour
-			 * = rawOffset / (60*60*1000); int min = Math.abs(rawOffset /
-			 * (60*1000)) % 60; boolean hasDST = timeZone.useDaylightTime();
-			 * boolean inDST = timeZone.inDaylightTime(today);
-			 */
     }
 
     return timeZoneList;
   }
 
   /**
-   * Retrieves the definitions of all server-side time zones.
+   * Retrieves all the time zone definitions in the Microsoft Exchange Server format.
    *
    * @return A Collection containing the definitions of the specified time
    * zones.
    */
   public Collection<TimeZoneDefinition> getServerTimeZones() {
-    Date today = new Date();
-    Collection<TimeZoneDefinition> timeZoneList = new ArrayList<TimeZoneDefinition>();
-    for (String timeZoneId : TimeZone.getAvailableIDs()) {
-      TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition();
-      timeZoneList.add(timeZoneDefinition);
-      TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-      timeZoneDefinition.id = timeZone.getID();
-      timeZoneDefinition.name = timeZone.getDisplayName(timeZone
-          .inDaylightTime(today), TimeZone.LONG);
-    }
-
-    return timeZoneList;
+    return getServerTimeZones(Arrays.asList(TimeZone.getAvailableIDs()));
   }
 
   /*
