@@ -163,6 +163,7 @@ import microsoft.exchange.webservices.data.property.complex.RuleOperation;
 import microsoft.exchange.webservices.data.property.complex.StringList;
 import microsoft.exchange.webservices.data.property.complex.UserId;
 import microsoft.exchange.webservices.data.property.complex.availability.OofSettings;
+import microsoft.exchange.webservices.data.property.complex.time.OlsonTimeZoneDefinition;
 import microsoft.exchange.webservices.data.property.complex.time.TimeZoneDefinition;
 import microsoft.exchange.webservices.data.property.definition.PropertyDefinitionBase;
 import microsoft.exchange.webservices.data.search.CalendarView;
@@ -178,6 +179,8 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 import microsoft.exchange.webservices.data.sync.ChangeCollection;
 import microsoft.exchange.webservices.data.sync.FolderChange;
 import microsoft.exchange.webservices.data.sync.ItemChange;
+import microsoft.exchange.webservices.data.util.TimeZoneUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -3975,56 +3978,39 @@ public class ExchangeService extends ExchangeServiceBase implements IAutodiscove
   }
 
   /**
-   * Retrieves the definitions of the specified server-side time zones.
+   * Retrieves the time zone definitions in the Microsoft Exchange Server format.
    *
-   * @param timeZoneIds the time zone ids
+   * @param timeZoneIds the time zone ids, either Olson or Microsoft ids
    * @return A Collection containing the definitions of the specified time
    * zones.
    */
   public Collection<TimeZoneDefinition> getServerTimeZones(
       Iterable<String> timeZoneIds) {
-    Date today = new Date();
+    
     Collection<TimeZoneDefinition> timeZoneList = new ArrayList<TimeZoneDefinition>();
     for (String timeZoneId : timeZoneIds) {
-      TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition();
-      timeZoneList.add(timeZoneDefinition);
-      TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-      timeZoneDefinition.id = timeZone.getID();
-      timeZoneDefinition.name = timeZone.getDisplayName(timeZone
-          .inDaylightTime(today), TimeZone.LONG);
-			/*
-			 * String shortName =
-			 * timeZone.getDisplayName(timeZone.inDaylightTime(today),
-			 * TimeZone.SHORT); String longName =
-			 * timeZone.getDisplayName(timeZone.inDaylightTime(today),
-			 * TimeZone.LONG); int rawOffset = timeZone.getRawOffset(); int hour
-			 * = rawOffset / (60*60*1000); int min = Math.abs(rawOffset /
-			 * (60*1000)) % 60; boolean hasDST = timeZone.useDaylightTime();
-			 * boolean inDST = timeZone.inDaylightTime(today);
-			 */
+      TimeZoneDefinition timeZoneDefinition = TimeZoneUtils.findSystemTimeZoneById(timeZoneId);
+      if (timeZoneDefinition != null) {
+        timeZoneList.add(timeZoneDefinition);
+      }
     }
 
     return timeZoneList;
   }
 
   /**
-   * Retrieves the definitions of all server-side time zones.
+   * Retrieves all known time zone definitions in the Microsoft's standard format.
+   * Technically, this method retrieves the client machine's time zones.
    *
-   * @return A Collection containing the definitions of the specified time
-   * zones.
+   * @return A Collection containing all time zone definitions on the server
    */
   public Collection<TimeZoneDefinition> getServerTimeZones() {
-    Date today = new Date();
     Collection<TimeZoneDefinition> timeZoneList = new ArrayList<TimeZoneDefinition>();
-    for (String timeZoneId : TimeZone.getAvailableIDs()) {
-      TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition();
+    for (String olsonTzId : TimeZone.getAvailableIDs()) {
+      TimeZone olsonTz = TimeZone.getTimeZone(olsonTzId);
+      TimeZoneDefinition timeZoneDefinition = new OlsonTimeZoneDefinition(olsonTz);
       timeZoneList.add(timeZoneDefinition);
-      TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-      timeZoneDefinition.id = timeZone.getID();
-      timeZoneDefinition.name = timeZone.getDisplayName(timeZone
-          .inDaylightTime(today), TimeZone.LONG);
     }
-
     return timeZoneList;
   }
 
