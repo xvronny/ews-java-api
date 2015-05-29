@@ -108,7 +108,7 @@ public abstract class ExchangeServiceBase implements Closeable {
   private ITraceListener traceListener = new EwsTraceListener();
 
   /**
-   * The pre authenticate.
+   * The preAuthentication flag.
    */
   private boolean preAuthenticate;
 

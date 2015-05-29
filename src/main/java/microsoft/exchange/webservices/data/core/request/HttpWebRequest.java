@@ -230,14 +230,20 @@ public abstract class HttpWebRequest {
   }
 
   /**
-   * Whether to use preemptive authentication. Currently not implemented, though.
+   * Gets a value that indicates whether HTTP pre-authentication should be
+   * performed.
+   *
+   * @return true indicates pre-authentication is set
    */
   public boolean isPreAuthenticate() {
     return preAuthenticate;
   }
 
   /**
-   * Whether to use preemptive authentication. Currently not implemented, though.
+   * Sets a value that indicates whether HTTP pre-authentication should be
+   * performed.
+   *
+   * @param preAuthenticate true to enable pre-authentication
    */
   public void setPreAuthenticate(boolean preAuthenticate) {
     this.preAuthenticate = preAuthenticate;
