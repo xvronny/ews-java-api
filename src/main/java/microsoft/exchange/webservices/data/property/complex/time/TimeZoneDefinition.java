@@ -75,12 +75,12 @@ public class TimeZoneDefinition extends ComplexProperty implements Comparator<Ti
   /**
    * The name.
    */
-  public String name;
+  protected String name;
 
   /**
    * The id.
    */
-  public String id;
+  protected String id;
 
   /**
    * The periods.
@@ -131,6 +131,18 @@ public class TimeZoneDefinition extends ComplexProperty implements Comparator<Ti
   public TimeZoneDefinition() {
     super();
   }
+  
+  /**
+   * Initializes a new instance of the TimeZoneDefinition class.
+   * 
+   * @param id
+   * @param name
+   */
+  public TimeZoneDefinition(String id, String name) {
+    super();
+    this.id = id;
+    this.name = name;
+  }
 
 
   /**
@@ -139,7 +151,7 @@ public class TimeZoneDefinition extends ComplexProperty implements Comparator<Ti
    * @param timeZonePeriod the time zone period
    * @return A TimeZoneTransitionGroup.
    */
-  private TimeZoneTransitionGroup createTransitionGroupToPeriod(
+  protected TimeZoneTransitionGroup createTransitionGroupToPeriod(
       TimeZonePeriod timeZonePeriod) {
     TimeZoneTransition transitionToPeriod = new TimeZoneTransition(this,
         timeZonePeriod);

@@ -96,9 +96,9 @@ public final class LegacyAvailabilityTimeZone extends ComplexProperty {
 		"GMT-"+formatter.format(this.bias.getHours())+":"+
 		formatter.format(this.bias.getMinutes());
 */
-    TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition();
-    timeZoneDefinition.id = UUID.randomUUID().toString();
-    timeZoneDefinition.name = "Custom time zone";
+    String timeZoneId = UUID.randomUUID().toString();
+    String timeZoneName = "Custom time zone";
+    TimeZoneDefinition timeZoneDefinition = new TimeZoneDefinition(timeZoneId, timeZoneName);
     return timeZoneDefinition;
   }
 

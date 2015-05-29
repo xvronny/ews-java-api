@@ -25,12 +25,17 @@ package microsoft.exchange.webservices.data.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
+
+import microsoft.exchange.webservices.data.property.complex.time.OlsonTimeZoneDefinition;
+import microsoft.exchange.webservices.data.property.complex.time.TimeZoneDefinition;
 
 /**
  * Miscellany timezone functions
  */
 public class TimeZoneUtils {
+  
   //a map of olson name > Microsoft Name
   final static private Map<String, String> olsonTimeZoneToMs = new HashMap<String, String>();
 
@@ -610,5 +615,32 @@ public class TimeZoneUtils {
   public static String getMicrosoftTimeZoneName(TimeZone timeZone) {
     return olsonTimeZoneToMs.get(timeZone.getID());
   }
+  
+  /**
+   * Search for TimeZoneDefinition from either Olson time zone definitions or Microsoft list.
+   * 
+   * @param timeZoneId time zone identifier, either Olson or Microsoft
+   * @return Microsoft time zone definition, null if definition not found.
+   */
+  public static TimeZoneDefinition findSystemTimeZoneById(String timeZoneId) {
+    // find time zone definition according to Java definitions
+    if (olsonTimeZoneToMs.containsKey(timeZoneId)) {
+      TimeZone javaTz = TimeZone.getTimeZone(timeZoneId);
+      return new OlsonTimeZoneDefinition(javaTz);
+    }
+    else if (timeZoneId != null && !timeZoneId.isEmpty()) {
+      // try finding timeZone id in the Microsoft values list
+      for (Entry<String, String> pair : olsonTimeZoneToMs.entrySet()) {
+        if (pair.getValue().equals(timeZoneId)) {
+          TimeZone javaTz = TimeZone.getTimeZone(pair.getKey());
+          return new OlsonTimeZoneDefinition(javaTz);
+        }
+      }
+    }
+    // null if it has no matching entry at all
+    return null;  
+  }
+  
+
 
 }
