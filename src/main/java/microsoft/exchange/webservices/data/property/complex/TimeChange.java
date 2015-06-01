@@ -224,7 +224,7 @@ public final class TimeChange extends ComplexProperty {
       return true;
     } else if (reader.getLocalName().equalsIgnoreCase(XmlElementNames.Time)) {
       SimpleDateFormat sdfin = new SimpleDateFormat(
-          "yyyy-MM-dd'T'HH:mm:ss");
+          "HH:mm:ss");
       Date tempDate = sdfin.parse(reader.readElementValue());
       this.time = new Time(tempDate);
       return true;
