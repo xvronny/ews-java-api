@@ -860,8 +860,9 @@ public final class EwsUtilities {
     LOG.debug(m.find());
     if (m.find()) {
       negative = true;
+      // this line was outside the loop and created exceptions
+      LOG.debug(m.group());
     }
-    LOG.debug(m.group());
 
     // Year
     m = PATTERN_YEAR.matcher(xsDuration);
